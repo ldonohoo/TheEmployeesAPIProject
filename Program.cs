@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Mvc;
+using TheEmployeeAPI.Employees;
+
 var builder = WebApplication.CreateBuilder(args);
 
 //simple list for data storage 
@@ -41,37 +44,83 @@ employeeRoute.MapGet(string.Empty, () => {
     // return with a status code attached
     // a return with a status code is very explicit
     // USE the Results class for returns!!
-    return Results.Ok(employees);
+
+    // now, we use the Select to iterate through the employees 
+    // and for each employee map the employee fields to a
+    // new instanceof GetEmployeeResponse...
+    // Select is for projection and it is creating a new object here
+
+    // this route returns a GetEmployeeResponse type object
+    // that does not include SSN
+    return Results.Ok(employees.Select(employee => new GetEmployeeResponse {
+        FirstName = employee.FirstName,
+        LastName = employee.LastName,
+        Address1 = employee.Address1,
+        Address2 = employee.Address2,
+        City = employee.City,
+        State = employee.State,
+        ZipCode = employee.ZipCode,
+        PhoneNumber = employee.PhoneNumber,
+        Email = employee.Email
+    }));
 });
 
 // you can constrain id to only be an int! {id:int}
+
+// this route takes in an integer, gets an employee of type
+// Employee, and maps it to a new GetEmployeeResponse object
+// that doesn't contain the SSN
 employeeRoute.MapGet("{id:int}", (int id) => {
     var employee = employees.SingleOrDefault(e => e.Id == id);
     if (employee == null)
     {
         return Results.NotFound();
     }
-    return Results.Ok(employee);
+    return Results.Ok(new GetEmployeeResponse {
+        FirstName = employee.FirstName,
+        LastName = employee.LastName,
+        Address1 = employee.Address1,
+        Address2 = employee.Address2,
+        City = employee.City,
+        State = employee.State,
+        ZipCode = employee.ZipCode,
+        PhoneNumber = employee.PhoneNumber,
+        Email = employee.Email
+    });
 });
 
-employeeRoute.MapPost(string.Empty, (Employee employee) => 
+// this route now takes in the CreateEmployeeRequest type object
+// (which has all the fields) and creates a new Employee type object
+// object to store in database
+employeeRoute.MapPost(string.Empty, ([FromBody] CreateEmployeeRequest employee) => 
 {
-    employee.Id = employees.Max(e => e.Id) + 1;
-    employees.Add(employee);
-    return Results.Created($"/employees/{employee.Id}", employee);
+    var newEmployee = new Employee {
+        Id = employees.Max(e => e.Id) + 1,
+        FirstName = employee.FirstName,
+        LastName = employee.LastName,
+        SocialSecurityNumber = employee.SocialSecurityNumber,
+        Address1 = employee.Address1,
+        Address2 = employee.Address2,
+        City = employee.City,
+        State = employee.State,
+        ZipCode = employee.ZipCode,
+        PhoneNumber = employee.PhoneNumber,
+        Email = employee.Email
+    };
+    employees.Add(newEmployee);
+    return Results.Created($"/employees/{newEmployee.Id}", employee);
 });
 
-employeeRoute.MapPut("{id:int}", (Employee employee, int id) => 
+// this route takes an UpdateEmployeeRequest object which doesn't 
+// contain firstname, lastname and SSN and maps it to a
+// single Employee object so it can update properly
+employeeRoute.MapPut("{id:int}", (UpdateEmployeeRequest employee, int id) => 
 {
     var existingEmployee = employees.SingleOrDefault(e => e.Id == id);
     if (existingEmployee == null)
     {
         return Results.NotFound();
     }
-    existingEmployee.FirstName = employee.FirstName;
-    existingEmployee.LastName = employee.LastName;
-    existingEmployee.FirstName = employee.FirstName;
-    existingEmployee.SocialSecurityNumber = employee.SocialSecurityNumber;
     existingEmployee.Address1 = employee.Address1;
     existingEmployee.Address2 = employee.Address2;
     existingEmployee.City = employee.City;
