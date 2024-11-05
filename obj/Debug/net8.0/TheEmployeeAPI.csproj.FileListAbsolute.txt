@@ -31,3 +31,4 @@
 /Users/lisa/Documents/code/EmployeeAPIProject/TheEmployeeAPI/obj/Debug/net8.0/TheEmployeeAPI.pdb
 /Users/lisa/Documents/code/EmployeeAPIProject/TheEmployeeAPI/obj/Debug/net8.0/TheEmployeeAPI.genruntimeconfig.cache
 /Users/lisa/Documents/code/EmployeeAPIProject/TheEmployeeAPI/obj/Debug/net8.0/ref/TheEmployeeAPI.dll
+/Users/lisa/Documents/code/EmployeeAPIProject/TheEmployeeAPI/obj/Debug/net8.0/TheEmployeeAPI.sourcelink.json

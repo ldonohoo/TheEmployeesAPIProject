@@ -3,8 +3,8 @@ var builder = WebApplication.CreateBuilder(args);
 //simple list for data storage 
 var employees = new List<Employee>
 {
-    new Employee { Id = 1, FirstName = "John", LastName = "Doe" },
-    new Employee { Id = 2, FirstName = "Jane", LastName = "Doe" }
+    new Employee { Id = 1, FirstName = "John", LastName = "Doe", SocialSecurityNumber = "123-45-3445" },
+    new Employee { Id = 2, FirstName = "Jane", LastName = "Doe", SocialSecurityNumber = "123-45-3446"  }
 };
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -59,6 +59,25 @@ employeeRoute.MapPost(string.Empty, (Employee employee) =>
     employee.Id = employees.Max(e => e.Id) + 1;
     employees.Add(employee);
     return Results.Created($"/employees/{employee.Id}", employee);
+});
+
+employeeRoute.MapPut("{id:int}", (Employee employee, int id) => 
+{
+    var existingEmployee = employees.SingleOrDefault(e => e.Id == id);
+    if (existingEmployee != null)
+    {
+        existingEmployee.FirstName = employee.FirstName;
+        existingEmployee.LastName = employee.LastName;
+        existingEmployee.FirstName = employee.FirstName;
+        existingEmployee.SocialSecurityNumber = employee.SocialSecurityNumber;
+        existingEmployee.Address1 = employee.Address1;
+        existingEmployee.Address2 = employee.Address2;
+        existingEmployee.City = employee.City;
+        existingEmployee.State = employee.State;
+        existingEmployee.ZipCode = employee.ZipCode;
+        existingEmployee.PhoneNumber = employee.PhoneNumber;
+        existingEmployee.Email = employee.Email;
+    }
 });
 
 app.Run();
