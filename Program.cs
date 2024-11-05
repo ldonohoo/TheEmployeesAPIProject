@@ -1,18 +1,30 @@
 using Microsoft.AspNetCore.Mvc;
+using TheEmployeeAPI;
+using TheEmployeeAPI.Abstractions;
 using TheEmployeeAPI.Employees;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//simple list for data storage 
-var employees = new List<Employee>
-{
-    new Employee { Id = 1, FirstName = "John", LastName = "Doe", SocialSecurityNumber = "123-45-3445" },
-    new Employee { Id = 2, FirstName = "Jane", LastName = "Doe", SocialSecurityNumber = "123-45-3446"  }
-};
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+// we are adding as a singleton here because it's just an in-memory
+// database but this will def change and it's not how to do in real
+// production systems (because we would have real database!)
+// this allows are EmployeeRepository service to be successfully
+// injected!!
+
+// so because we may want to test this separately, we typically 
+// don't use the specific type EmployeeRepository, instead we
+// use the interface type of IRepository<Employee>
+// then below in the routes we change the EmployeeRepository types to 
+// IRepository<Employee> as well
+//builder.Services.AddSingleton<EmployeeRepository>();
+
+// so use interface type not concrete type!!!
+// very common to do this:
+builder.Services.AddSingleton<IRepository<Employee>, EmployeeRepository>();
 
 var app = builder.Build();
 
@@ -39,7 +51,9 @@ app.UseHttpsRedirection();
 //     // we won't be doing it that way however
 // });
 //      Instead we are just going to use a plain old delegate pattern!!!
-employeeRoute.MapGet(string.Empty, () => {
+
+// add the repository through dependency injection!
+employeeRoute.MapGet(string.Empty, ([FromServices] IRepository<Employee> repo) => {
     // return employees; //this totally works, but you can also
     // return with a status code attached
     // a return with a status code is very explicit
@@ -52,7 +66,7 @@ employeeRoute.MapGet(string.Empty, () => {
 
     // this route returns a GetEmployeeResponse type object
     // that does not include SSN
-    return Results.Ok(employees.Select(employee => new GetEmployeeResponse {
+    return Results.Ok(repo.GetAll().Select(employee => new GetEmployeeResponse {
         FirstName = employee.FirstName,
         LastName = employee.LastName,
         Address1 = employee.Address1,
@@ -70,8 +84,9 @@ employeeRoute.MapGet(string.Empty, () => {
 // this route takes in an integer, gets an employee of type
 // Employee, and maps it to a new GetEmployeeResponse object
 // that doesn't contain the SSN
-employeeRoute.MapGet("{id:int}", (int id) => {
-    var employee = employees.SingleOrDefault(e => e.Id == id);
+employeeRoute.MapGet("{id:int}", ([FromServices] IRepository<Employee> repo, 
+                                  [FromRoute] int id) => {
+    var employee = repo.GetById(id);
     if (employee == null)
     {
         return Results.NotFound();
@@ -92,10 +107,10 @@ employeeRoute.MapGet("{id:int}", (int id) => {
 // this route now takes in the CreateEmployeeRequest type object
 // (which has all the fields) and creates a new Employee type object
 // object to store in database
-employeeRoute.MapPost(string.Empty, ([FromBody] CreateEmployeeRequest employee) => 
+employeeRoute.MapPost(string.Empty, ([FromBody] CreateEmployeeRequest employee,
+                                     [FromServices] IRepository<Employee> repo) => 
 {
     var newEmployee = new Employee {
-        Id = employees.Max(e => e.Id) + 1,
         FirstName = employee.FirstName,
         LastName = employee.LastName,
         SocialSecurityNumber = employee.SocialSecurityNumber,
@@ -107,16 +122,18 @@ employeeRoute.MapPost(string.Empty, ([FromBody] CreateEmployeeRequest employee) 
         PhoneNumber = employee.PhoneNumber,
         Email = employee.Email
     };
-    employees.Add(newEmployee);
+    repo.Create(newEmployee);
     return Results.Created($"/employees/{newEmployee.Id}", employee);
 });
 
 // this route takes an UpdateEmployeeRequest object which doesn't 
 // contain firstname, lastname and SSN and maps it to a
 // single Employee object so it can update properly
-employeeRoute.MapPut("{id:int}", (UpdateEmployeeRequest employee, int id) => 
+employeeRoute.MapPut("{id:int}", ([FromBody] UpdateEmployeeRequest employee, 
+                                  [FromRoute] int id,
+                                  [FromServices] IRepository<Employee> repo) => 
 {
-    var existingEmployee = employees.SingleOrDefault(e => e.Id == id);
+    var existingEmployee = repo.GetById(id);
     if (existingEmployee == null)
     {
         return Results.NotFound();
@@ -127,7 +144,9 @@ employeeRoute.MapPut("{id:int}", (UpdateEmployeeRequest employee, int id) =>
     existingEmployee.State = employee.State;
     existingEmployee.ZipCode = employee.ZipCode;
     existingEmployee.PhoneNumber = employee.PhoneNumber;
-    existingEmployee.Email = employee.Email;  
+    existingEmployee.Email = employee.Email; 
+
+    repo.Update(existingEmployee);
     return Results.Ok(existingEmployee);
 });
 
