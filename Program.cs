@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using TheEmployeeAPI;
 using TheEmployeeAPI.Abstractions;
@@ -25,6 +26,8 @@ builder.Services.AddSwaggerGen();
 // so use interface type not concrete type!!!
 // very common to do this:
 builder.Services.AddSingleton<IRepository<Employee>, EmployeeRepository>();
+// service to return STRUCTURED data describing errors from an API
+builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 
@@ -107,23 +110,44 @@ employeeRoute.MapGet("{id:int}", ([FromServices] IRepository<Employee> repo,
 // this route now takes in the CreateEmployeeRequest type object
 // (which has all the fields) and creates a new Employee type object
 // object to store in database
-employeeRoute.MapPost(string.Empty, ([FromBody] CreateEmployeeRequest employee,
+employeeRoute.MapPost(string.Empty, ([FromBody] CreateEmployeeRequest employeeRequest,
                                      [FromServices] IRepository<Employee> repo) => 
 {
+    var validationProblems = new List<ValidationResult>();
+    // calls the TryValidateObject method to perform validation!
+    //      parms: 
+    //           instance of object you want to validate
+    //           the validation context created with employeeRequest
+    //           where to throw the validation problems (the list we created!)
+    //           validate all properties=true
+    var isValid = Validator.TryValidateObject(
+        employeeRequest, 
+        new ValidationContext(employeeRequest), 
+        validationProblems, 
+        true 
+    );
+    if (!isValid)
+    {
+        return Results.BadRequest(validationProblems.ToValidationProblemDetails());
+    }
     var newEmployee = new Employee {
-        FirstName = employee.FirstName,
-        LastName = employee.LastName,
-        SocialSecurityNumber = employee.SocialSecurityNumber,
-        Address1 = employee.Address1,
-        Address2 = employee.Address2,
-        City = employee.City,
-        State = employee.State,
-        ZipCode = employee.ZipCode,
-        PhoneNumber = employee.PhoneNumber,
-        Email = employee.Email
+        // the bang assures the compiler FirstName will 
+        // NOT be null, otherwise you get compile 
+        // time error trying to set a possibly null
+        // value to a non-nullable value...
+        FirstName = employeeRequest.FirstName!,
+        LastName = employeeRequest.LastName!,
+        SocialSecurityNumber = employeeRequest.SocialSecurityNumber,
+        Address1 = employeeRequest.Address1,
+        Address2 = employeeRequest.Address2,
+        City = employeeRequest.City,
+        State = employeeRequest.State,
+        ZipCode = employeeRequest.ZipCode,
+        PhoneNumber = employeeRequest.PhoneNumber,
+        Email = employeeRequest.Email
     };
     repo.Create(newEmployee);
-    return Results.Created($"/employees/{newEmployee.Id}", employee);
+    return Results.Created($"/employees/{newEmployee.Id}", employeeRequest);
 });
 
 // this route takes an UpdateEmployeeRequest object which doesn't 

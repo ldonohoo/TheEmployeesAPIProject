@@ -32,3 +32,5 @@
 /Users/lisa/Documents/code/EmployeeAPIProject/TheEmployeeAPI/obj/Debug/net8.0/TheEmployeeAPI.genruntimeconfig.cache
 /Users/lisa/Documents/code/EmployeeAPIProject/TheEmployeeAPI/obj/Debug/net8.0/ref/TheEmployeeAPI.dll
 /Users/lisa/Documents/code/EmployeeAPIProject/TheEmployeeAPI/obj/Debug/net8.0/TheEmployeeAPI.sourcelink.json
+/Users/lisa/Documents/code/EmployeeAPIProject/TheEmployeeAPI/bin/Debug/net8.0/FluentValidation.dll
+/Users/lisa/Documents/code/EmployeeAPIProject/TheEmployeeAPI/bin/Debug/net8.0/FluentValidation.DependencyInjectionExtensions.dll
