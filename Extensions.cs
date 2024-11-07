@@ -1,6 +1,6 @@
 using System;
-using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Mvc;
+using FluentValidation.Results;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace TheEmployeeAPI.Employees;
 
@@ -13,25 +13,18 @@ namespace TheEmployeeAPI.Employees;
 
 public static class Extensions
 {
-    public static ValidationProblemDetails ToValidationProblemDetails(this List<ValidationResult> validationResults)
+    // model state is an object that says whether a field is valid/invalid/etc.
+    // model state you will see used with MVC with views applications (not
+    // covered in this course) )
+    public static ModelStateDictionary ToModelStateDictionary(this ValidationResult validationResult)
     {
-        var problemDetails = new Microsoft.AspNetCore.Mvc.ValidationProblemDetails();
+        var modelState = new ModelStateDictionary();
 
-        foreach (var validationResult in validationResults)
+        foreach (var error in validationResult.Errors)
         {
-            foreach (var memberName in validationResult.MemberNames)
-            {
-                if (problemDetails.Errors.ContainsKey(memberName))
-                {
-                    problemDetails.Errors[memberName] = problemDetails.Errors[memberName].Concat([validationResult.ErrorMessage]).ToArray()!;
-                }
-                else
-                {
-                    problemDetails.Errors[memberName] = new List<string> { validationResult.ErrorMessage! }.ToArray();
-                }
-            }
+            modelState.AddModelError(error.PropertyName, error.ErrorMessage);
         }
-
-        return problemDetails;
+        return modelState;
     }
+
 }

@@ -56,7 +56,6 @@ public class EmployeeRepository : IRepository<Employee>
             existingEmployee.LastName = entity.LastName;
         }
     }
-
     public void Delete(Employee entity)
     {
         if (entity == null)
