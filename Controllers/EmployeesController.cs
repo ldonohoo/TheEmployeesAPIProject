@@ -62,9 +62,9 @@ public class EmployeesController : BaseController
         });
         }
      [HttpPost]
-    public Task<IActionResult> CreateEmployee([FromBody] CreateEmployeeRequest employeeRequest)
+    public async Task<IActionResult> CreateEmployee([FromBody] CreateEmployeeRequest employeeRequest)
     {
-
+        await Task.CompletedTask;
 
         var newEmployee = new Employee
         {
