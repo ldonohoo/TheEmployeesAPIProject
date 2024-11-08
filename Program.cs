@@ -34,7 +34,17 @@ builder.Services.AddProblemDetails();
 //   to see if need IValidator
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 // this will add controllers to the DI pipeline!  Need to use controllers!
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+    {
+        // this option makes sure that this filter is part of all of 
+        //   our controllers.  without this the fluentValidationFilter is
+        //   just a class in the project and will not get used!!
+        // this is micro middleware 
+        // this will run onActionExecution (before route processes) and
+        // onActionExecuted (after route processes) methods in our 
+        // FluentValidationFilter class
+        options.Filters.Add<FluentValidationFilter>();
+    });
 
 var app = builder.Build();
 
