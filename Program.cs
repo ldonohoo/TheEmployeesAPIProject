@@ -1,16 +1,64 @@
 using System.ComponentModel.DataAnnotations;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 using TheEmployeeAPI;
 using TheEmployeeAPI.Abstractions;
 using TheEmployeeAPI.Employees;
 
+// dummy data used for testing
+// create a list of employees
+// var employees = new List<Employee>() 
+//     {
+//         new Employee {  Id = 1, 
+//                         FirstName = "John",
+//                         LastName = "Doe", 
+//                         Benefits = new List<EmployeeBenefit> {
+//                             new EmployeeBenefit {    
+//                                 Id = 1,
+//                                 EmployeeId = 1,
+//                                 BenefitType = BenefitType.Health,
+//                                 Cost = 100 
+//                             }, 
+//                             new EmployeeBenefit {    
+//                                 Id = 1,
+//                                 EmployeeId = 1,
+//                                 BenefitType = BenefitType.Dental,
+//                                 Cost = 5 
+//                             }
+//                         }   
+//         },
+//         new Employee { Id = 2,
+//                      FirstName = "Jane",
+//                      LastName = "Doe",
+//                      Benefits = new List<EmployeeBenefit>()
+//                      }
+//     };
+//     // create a respository
+//     var employeeRepository = new EmployeeRepository();
+//     // for each employee, add to the repository!!
+//     foreach (var e in employees)
+//     {
+//         employeeRepository.Create(e);
+//     }
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add/register services to the container.
+// These services are all being added to the root provider
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// the swagger option is for enabling xml comments
+builder.Services.AddSwaggerGen(options =>
+{
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "TheEmployeeAPI.xml"));
+});
 // we are adding as a singleton here because it's just an in-memory
 // database but this will def change and it's not how to do in real
 // production systems (because we would have real database!)
@@ -45,8 +93,26 @@ builder.Services.AddControllers(options =>
         // FluentValidationFilter class
         options.Filters.Add<FluentValidationFilter>();
     });
+builder.Services.AddDbContext<AppDbContext>(options => {
+    options.UseSqlite("Data Source=employee.db");
+});
+
+
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
+
+// Once the app is built, we have access to the services from
+//      the dependency injection pipeline!
+// We use this to seed the database with test data
+
+// create a temporary scope to access the context
+// dispose of the scope when done seeding database
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    SeedData.Seed(services);
+}
 
 // create a route group for employee
 var employeeRoute = app.MapGroup("employees");
