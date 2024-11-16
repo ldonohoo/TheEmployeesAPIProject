@@ -83,13 +83,13 @@ namespace TheEmployeeAPI.Migrations
 
             modelBuilder.Entity("EmployeeBenefit", b =>
                 {
-                    b.HasOne("Employee", "employee")
+                    b.HasOne("Employee", "Employee")
                         .WithMany("Benefits")
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("employee");
+                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("Employee", b =>
