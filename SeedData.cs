@@ -1,14 +1,16 @@
 using System;
+using Microsoft.EntityFrameworkCore;
 
 namespace TheEmployeeAPI;
 
 // create a static class to seed the database
 public static class SeedData
 {
-    public static void Seed(IServiceProvider serviceProvider)
+    public static void MigrateAndSeed(IServiceProvider serviceProvider)
     {
         var context = serviceProvider.GetRequiredService<AppDbContext>();
-
+        context.Database.Migrate();
+        
         if (!context.Employees.Any())
         {
             context.Employees.AddRange(
@@ -23,10 +25,10 @@ public static class SeedData
                     ZipCode = "12345",
                     PhoneNumber = "555-123-4567",
                     Email = "john.doe@example.com",
-                    Benefits = new List<EmployeeBenefit>
+                    Benefits = new List<EmployeeBenefits>
                     {
-                        new EmployeeBenefit { BenefitType = BenefitType.Health, Cost = 100.00m },
-                        new EmployeeBenefit { BenefitType = BenefitType.Dental, Cost = 50.00m }
+                        new EmployeeBenefits { BenefitType = BenefitType.Health, Cost = 100.00m },
+                        new EmployeeBenefits { BenefitType = BenefitType.Dental, Cost = 50.00m }
                     }
                 },
                 new Employee
@@ -41,10 +43,10 @@ public static class SeedData
                     ZipCode = "98765",
                     PhoneNumber = "555-987-6543",
                     Email = "jane.smith@example.com",
-                    Benefits = new List<EmployeeBenefit>
+                    Benefits = new List<EmployeeBenefits>
                     {
-                        new EmployeeBenefit { BenefitType = BenefitType.Health, Cost = 120.00m },
-                        new EmployeeBenefit { BenefitType = BenefitType.Vision, Cost = 30.00m }
+                        new EmployeeBenefits { BenefitType = BenefitType.Health, Cost = 120.00m },
+                        new EmployeeBenefits { BenefitType = BenefitType.Vision, Cost = 30.00m }
                     }
                 }
             );

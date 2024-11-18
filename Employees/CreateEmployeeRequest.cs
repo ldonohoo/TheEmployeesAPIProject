@@ -37,4 +37,3 @@ public class CreateEmployeeRequestValidator : AbstractValidator<CreateEmployeeRe
         RuleFor(x => x.LastName).NotEmpty();
     }
 }
-

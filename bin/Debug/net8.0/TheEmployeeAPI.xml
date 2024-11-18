@@ -4,7 +4,7 @@
         <name>TheEmployeeAPI</name>
     </assembly>
     <members>
-        <member name="M:TheEmployeeAPI.Controllers.EmployeesController.GetAllEmployees">
+        <member name="M:TheEmployeeAPI.Controllers.EmployeesController.GetAllEmployees(TheEmployeeAPI.Employees.GetAllEmployeesRequest)">
             <summary> Gets All Employees </summary>
             <returns> Returns an array of all employees. </returns>
         </member>
@@ -15,38 +15,16 @@
             <param name="id"> The id of the employee </param>
             <returns>  Returns a single employee record. </returns>
         </member>
-        <member name="M:TheEmployeeAPI.Controllers.EmployeesController.CreateEmployee(TheEmployeeAPI.Employees.CreateEmployeeRequest)">
-            <summary>
-            Creates a new employee.
-            </summary>
-            <param name="employeeRequest">The employee to be created.</param>
-            <returns>A link to the employee that was created.</returns>
-        </member>
-        <member name="M:TheEmployeeAPI.Controllers.EmployeesController.UpdateEmployee(System.Int32,TheEmployeeAPI.Employees.UpdateEmployeeRequest)">
-            <summary>
-            Updates an employee.
-            </summary>
-            <param name="id">The ID of the employee to update.</param>
-            <param name="employeeRequest">The employee data to update.</param>
-            <returns></returns>
-        </member>
-        <member name="M:TheEmployeeAPI.Controllers.EmployeesController.GetBenefitsForEmployee(System.Int32)">
-            <summary>
-            Gets the benefits for an employee.
-            </summary>
-            <param name="employeeId">The ID to get the benefits for.</param>
-            <returns>The benefits for that employee.</returns>
-        </member>
-        <member name="T:TheEmployeeAPI.Migrations.InitialCreate">
+        <member name="T:TheEmployeeAPI.Migrations.FixStuff">
             <inheritdoc />
         </member>
-        <member name="M:TheEmployeeAPI.Migrations.InitialCreate.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+        <member name="M:TheEmployeeAPI.Migrations.FixStuff.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
             <inheritdoc />
         </member>
-        <member name="M:TheEmployeeAPI.Migrations.InitialCreate.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+        <member name="M:TheEmployeeAPI.Migrations.FixStuff.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
             <inheritdoc />
         </member>
-        <member name="M:TheEmployeeAPI.Migrations.InitialCreate.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+        <member name="M:TheEmployeeAPI.Migrations.FixStuff.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
     </members>

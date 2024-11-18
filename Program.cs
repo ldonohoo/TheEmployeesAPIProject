@@ -1,49 +1,6 @@
-using System.ComponentModel.DataAnnotations;
 using FluentValidation;
-using Microsoft.AspNetCore.Authorization.Infrastructure;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
 using TheEmployeeAPI;
-using TheEmployeeAPI.Abstractions;
-using TheEmployeeAPI.Employees;
-
-// dummy data used for testing
-// create a list of employees
-// var employees = new List<Employee>() 
-//     {
-//         new Employee {  Id = 1, 
-//                         FirstName = "John",
-//                         LastName = "Doe", 
-//                         Benefits = new List<EmployeeBenefit> {
-//                             new EmployeeBenefit {    
-//                                 Id = 1,
-//                                 EmployeeId = 1,
-//                                 BenefitType = BenefitType.Health,
-//                                 Cost = 100 
-//                             }, 
-//                             new EmployeeBenefit {    
-//                                 Id = 1,
-//                                 EmployeeId = 1,
-//                                 BenefitType = BenefitType.Dental,
-//                                 Cost = 5 
-//                             }
-//                         }   
-//         },
-//         new Employee { Id = 2,
-//                      FirstName = "Jane",
-//                      LastName = "Doe",
-//                      Benefits = new List<EmployeeBenefit>()
-//                      }
-//     };
-//     // create a respository
-//     var employeeRepository = new EmployeeRepository();
-//     // for each employee, add to the repository!!
-//     foreach (var e in employees)
-//     {
-//         employeeRepository.Create(e);
-//     }
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -59,22 +16,6 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "TheEmployeeAPI.xml"));
 });
-// we are adding as a singleton here because it's just an in-memory
-// database but this will def change and it's not how to do in real
-// production systems (because we would have real database!)
-// this allows are EmployeeRepository service to be successfully
-// injected!!
-
-// so because we may want to test this separately, we typically 
-// don't use the specific type EmployeeRepository, instead we
-// use the interface type of IRepository<Employee>
-// then below in the routes we change the EmployeeRepository types to 
-// IRepository<Employee> as well
-//builder.Services.AddSingleton<EmployeeRepository>();
-
-// so use interface type not concrete type!!!
-// very common to do this:
-builder.Services.AddSingleton<IRepository<Employee>, EmployeeRepository>();
 // service to return STRUCTURED data describing errors from an API
 builder.Services.AddProblemDetails();
 // this allows us to request an IValidator<CreateEmployeeRequest> from the 
@@ -111,7 +52,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    SeedData.Seed(services);
+    SeedData.MigrateAndSeed(services);
 }
 
 // create a route group for employee

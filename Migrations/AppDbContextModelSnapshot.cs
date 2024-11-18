@@ -59,7 +59,7 @@ namespace TheEmployeeAPI.Migrations
                     b.ToTable("Employees");
                 });
 
-            modelBuilder.Entity("EmployeeBenefit", b =>
+            modelBuilder.Entity("EmployeeBenefits", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -78,10 +78,10 @@ namespace TheEmployeeAPI.Migrations
 
                     b.HasIndex("EmployeeId");
 
-                    b.ToTable("EmployeeBenefit");
+                    b.ToTable("EmployeeBenefits");
                 });
 
-            modelBuilder.Entity("EmployeeBenefit", b =>
+            modelBuilder.Entity("EmployeeBenefits", b =>
                 {
                     b.HasOne("Employee", "Employee")
                         .WithMany("Benefits")

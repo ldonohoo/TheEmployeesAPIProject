@@ -5,7 +5,7 @@
 namespace TheEmployeeAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class FixStuff : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -33,7 +33,7 @@ namespace TheEmployeeAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "EmployeeBenefit",
+                name: "EmployeeBenefits",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -44,9 +44,9 @@ namespace TheEmployeeAPI.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EmployeeBenefit", x => x.Id);
+                    table.PrimaryKey("PK_EmployeeBenefits", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_EmployeeBenefit_Employees_EmployeeId",
+                        name: "FK_EmployeeBenefits_Employees_EmployeeId",
                         column: x => x.EmployeeId,
                         principalTable: "Employees",
                         principalColumn: "Id",
@@ -54,8 +54,8 @@ namespace TheEmployeeAPI.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_EmployeeBenefit_EmployeeId",
-                table: "EmployeeBenefit",
+                name: "IX_EmployeeBenefits_EmployeeId",
+                table: "EmployeeBenefits",
                 column: "EmployeeId");
         }
 
@@ -63,7 +63,7 @@ namespace TheEmployeeAPI.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "EmployeeBenefit");
+                name: "EmployeeBenefits");
 
             migrationBuilder.DropTable(
                 name: "Employees");

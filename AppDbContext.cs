@@ -19,5 +19,12 @@ public class AppDbContext : DbContext
     }
     // declare a table with DbSet!
     // collection of Employee entities mapped to employees table in the database!
-    public DbSet<Employee> Employees { get; set; }
+    public DbSet<Employee> Employees { get; set; } = null!;
+       protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        // we don't really need any changes on model create yet, the base
+        //  method called below doesn't really do anything so this 
+        //   is just a placeholder at best right now
+        // base.OnModelCreating(modelBuilder);
+    }
 }
