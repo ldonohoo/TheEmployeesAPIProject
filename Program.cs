@@ -36,6 +36,8 @@ builder.Services.AddControllers(options =>
     });
 builder.Services.AddDbContext<AppDbContext>(options => {
     options.UseSqlite("Data Source=employee.db");
+    // add option to turn off auto change tracking...
+    options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking); 
 });
 
 
