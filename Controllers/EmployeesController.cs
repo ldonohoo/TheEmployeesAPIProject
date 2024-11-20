@@ -196,23 +196,23 @@ public class EmployeesController : BaseController
     // /// </summary>
     // /// <param name="employeeId">The ID to get the benefits for.</param>
     // /// <returns>The benefits for that employee.</returns>
-    // [HttpGet("{employeeId}/benefits")]
-    // [ProducesResponseType(typeof(IEnumerable<GetEmployeeResponseEmployeeBenefit>), StatusCodes.Status200OK)]
-    // [ProducesResponseType(StatusCodes.Status404NotFound)]
-    // [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    // public IActionResult GetBenefitsForEmployee(int employeeId)
-    // {
-    //     var employee = _repository.GetById(employeeId);
-    //     if (employee == null)
-    //     {
-    //         return NotFound();
-    //     }
-    //     var responseBenefits = employee.Benefits.Select(BenefitToBenefitResponse);
-    //     // the above code is syntactic sugar for below, and called method group
-    //     // syntax...
-    //     // var responseBenefits = employee.Benefits.Select(benefit => BenefitToBenefitResponse(benefit));
-    //     return Ok(responseBenefits);
-    // }
+    [HttpGet("{employeeId}/benefits")]
+    [ProducesResponseType(typeof(IEnumerable<GetEmployeeResponseEmployeeBenefit>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetBenefitsForEmployee(int employeeId)
+    {
+        var employee = await _dbContext.Employees.FindAsync(employeeId);
+        if (employee == null)
+        {
+            return NotFound();
+        }
+        var responseBenefits = employee.Benefits.Select(BenefitToBenefitResponse);
+        // the above code is syntactic sugar for below, and called method group
+        // syntax...
+        // var responseBenefits = employee.Benefits.Select(benefit => BenefitToBenefitResponse(benefit));
+        return Ok(responseBenefits);
+    }
 
     // quick way of mapping an employee to an employee response object for our
     // get routes.
