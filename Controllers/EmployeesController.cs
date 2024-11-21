@@ -35,7 +35,6 @@ public class EmployeesController : BaseController
         // skip is used to skip to the appropriate starting record
         //     (if page is 1 we don't skip anything...)
         IQueryable<Employee> query = _dbContext.Employees
-            .Include(e => e.Benefits)
             .Skip((page - 1) * numberOfRecords)
             .Take(numberOfRecords);
 
@@ -191,28 +190,37 @@ public class EmployeesController : BaseController
         return NoContent();
     }
 
-    // /// <summary>
-    // /// Gets the benefits for an employee.
-    // /// </summary>
-    // /// <param name="employeeId">The ID to get the benefits for.</param>
-    // /// <returns>The benefits for that employee.</returns>
-    [HttpGet("{employeeId}/benefits")]
-    [ProducesResponseType(typeof(IEnumerable<GetEmployeeResponseEmployeeBenefit>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetBenefitsForEmployee(int employeeId)
+/// <summary>
+/// Gets the benefits for an employee.
+/// </summary>
+/// <param name="employeeId">The ID to get the benefits for.</param>
+/// <returns>The benefits for that employee.</returns>
+[HttpGet("{employeeId}/benefits")]
+[ProducesResponseType(typeof(IEnumerable<GetEmployeeResponseEmployeeBenefit>), StatusCodes.Status200OK)]
+[ProducesResponseType(StatusCodes.Status404NotFound)]
+[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+public async Task<IActionResult> GetBenefitsForEmployee(int employeeId)
+{
+    var employee = await _dbContext.Employees
+        .Include(e => e.Benefits)
+        .ThenInclude(e => e.Benefit)
+        .SingleOrDefaultAsync(e => e.Id == employeeId);
+
+    if (employee == null)
     {
-        var employee = await _dbContext.Employees.FindAsync(employeeId);
-        if (employee == null)
-        {
-            return NotFound();
-        }
-        var responseBenefits = employee.Benefits.Select(BenefitToBenefitResponse);
-        // the above code is syntactic sugar for below, and called method group
-        // syntax...
-        // var responseBenefits = employee.Benefits.Select(benefit => BenefitToBenefitResponse(benefit));
-        return Ok(responseBenefits);
+        return NotFound();
     }
+
+    var benefits = employee.Benefits.Select(b => new GetEmployeeResponseEmployeeBenefit
+    {
+        Id = b.Id,
+        Name = b.Benefit.Name,
+        Description = b.Benefit.Description,
+        Cost = b.CostToEmployee ?? b.Benefit.BaseCost   //we want to use the cost to employee if it exists, otherwise we want to use the base cost
+    });
+
+    return Ok(benefits);
+}
 
     // quick way of mapping an employee to an employee response object for our
     // get routes.
@@ -228,32 +236,11 @@ public class EmployeesController : BaseController
             State = employee.State,
             ZipCode = employee.ZipCode,
             PhoneNumber = employee.PhoneNumber,
-            Email = employee.Email,
-            // go through the benefits collection
-            //   - for each benefit, create a new employee benefit response object
-            //   - slap all of these new objects into a new list!
-            Benefits = employee.Benefits.Select(benefit => new GetEmployeeResponseEmployeeBenefit
-            {
-                Id = benefit.Id,
-                EmployeeId = benefit.EmployeeId,
-                BenefitType = benefit.BenefitType,
-                Cost = benefit.Cost
-            }).ToList()
+            Email = employee.Email
         };
     }
 
-    // this just maps a benefit entity to a benifit response object so we don't 
-    // return the entity object!
-    private static GetEmployeeResponseEmployeeBenefit BenefitToBenefitResponse(EmployeeBenefits benefit)
-{
-    return new GetEmployeeResponseEmployeeBenefit
-    {
-        Id = benefit.Id,
-        EmployeeId = benefit.EmployeeId,
-        BenefitType = benefit.BenefitType,
-        Cost = benefit.Cost
-    };
-}
+
 }
 
 

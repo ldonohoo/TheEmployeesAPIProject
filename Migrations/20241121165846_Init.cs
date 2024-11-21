@@ -5,11 +5,26 @@
 namespace TheEmployeeAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class FixStuff : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Benefits",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: false),
+                    BaseCost = table.Column<decimal>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Benefits", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Employees",
                 columns: table => new
@@ -39,12 +54,18 @@ namespace TheEmployeeAPI.Migrations
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     EmployeeId = table.Column<int>(type: "INTEGER", nullable: false),
-                    BenefitType = table.Column<int>(type: "INTEGER", nullable: false),
-                    Cost = table.Column<decimal>(type: "TEXT", nullable: false)
+                    BenefitId = table.Column<int>(type: "INTEGER", nullable: false),
+                    CostToEmployee = table.Column<decimal>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_EmployeeBenefits", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EmployeeBenefits_Benefits_BenefitId",
+                        column: x => x.BenefitId,
+                        principalTable: "Benefits",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_EmployeeBenefits_Employees_EmployeeId",
                         column: x => x.EmployeeId,
@@ -52,6 +73,12 @@ namespace TheEmployeeAPI.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmployeeBenefits_BenefitId_EmployeeId",
+                table: "EmployeeBenefits",
+                columns: new[] { "BenefitId", "EmployeeId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_EmployeeBenefits_EmployeeId",
@@ -64,6 +91,9 @@ namespace TheEmployeeAPI.Migrations
         {
             migrationBuilder.DropTable(
                 name: "EmployeeBenefits");
+
+            migrationBuilder.DropTable(
+                name: "Benefits");
 
             migrationBuilder.DropTable(
                 name: "Employees");

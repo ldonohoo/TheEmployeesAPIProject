@@ -16,6 +16,28 @@ namespace TheEmployeeAPI.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
 
+            modelBuilder.Entity("Benefit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("BaseCost")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Benefits");
+                });
+
             modelBuilder.Entity("Employee", b =>
                 {
                     b.Property<int>("Id")
@@ -59,16 +81,16 @@ namespace TheEmployeeAPI.Migrations
                     b.ToTable("Employees");
                 });
 
-            modelBuilder.Entity("EmployeeBenefits", b =>
+            modelBuilder.Entity("EmployeeBenefit", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("BenefitType")
+                    b.Property<int>("BenefitId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<decimal>("Cost")
+                    b.Property<decimal?>("CostToEmployee")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("EmployeeId")
@@ -78,16 +100,27 @@ namespace TheEmployeeAPI.Migrations
 
                     b.HasIndex("EmployeeId");
 
+                    b.HasIndex("BenefitId", "EmployeeId")
+                        .IsUnique();
+
                     b.ToTable("EmployeeBenefits");
                 });
 
-            modelBuilder.Entity("EmployeeBenefits", b =>
+            modelBuilder.Entity("EmployeeBenefit", b =>
                 {
+                    b.HasOne("Benefit", "Benefit")
+                        .WithMany()
+                        .HasForeignKey("BenefitId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Employee", "Employee")
                         .WithMany("Benefits")
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Benefit");
 
                     b.Navigation("Employee");
                 });

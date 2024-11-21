@@ -15,16 +15,23 @@
             <param name="id"> The id of the employee </param>
             <returns>  Returns a single employee record. </returns>
         </member>
-        <member name="T:TheEmployeeAPI.Migrations.FixStuff">
+        <member name="M:TheEmployeeAPI.Controllers.EmployeesController.GetBenefitsForEmployee(System.Int32)">
+            <summary>
+            Gets the benefits for an employee.
+            </summary>
+            <param name="employeeId">The ID to get the benefits for.</param>
+            <returns>The benefits for that employee.</returns>
+        </member>
+        <member name="T:TheEmployeeAPI.Migrations.Init">
             <inheritdoc />
         </member>
-        <member name="M:TheEmployeeAPI.Migrations.FixStuff.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+        <member name="M:TheEmployeeAPI.Migrations.Init.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
             <inheritdoc />
         </member>
-        <member name="M:TheEmployeeAPI.Migrations.FixStuff.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+        <member name="M:TheEmployeeAPI.Migrations.Init.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
             <inheritdoc />
         </member>
-        <member name="M:TheEmployeeAPI.Migrations.FixStuff.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+        <member name="M:TheEmployeeAPI.Migrations.Init.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
     </members>
