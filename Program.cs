@@ -1,5 +1,6 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Internal;
 using TheEmployeeAPI;
 
 
@@ -18,6 +19,8 @@ builder.Services.AddSwaggerGen(options =>
 });
 // service to return STRUCTURED data describing errors from an API
 builder.Services.AddProblemDetails();
+builder.Services.AddSingleton<ISystemClock, SystemClock>();
+
 // this allows us to request an IValidator<CreateEmployeeRequest> from the 
 // DI container and get it: scan Program and look at every type
 //   to see if need IValidator
@@ -37,9 +40,8 @@ builder.Services.AddControllers(options =>
 builder.Services.AddDbContext<AppDbContext>(options => {
     options.UseSqlite("Data Source=employee.db");
     // add option to turn off auto change tracking...
-    options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking); 
+    // options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking); 
 });
-
 
 builder.Services.AddHttpContextAccessor();
 

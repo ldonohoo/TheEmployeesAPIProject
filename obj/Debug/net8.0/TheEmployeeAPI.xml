@@ -34,5 +34,17 @@
         <member name="M:TheEmployeeAPI.Migrations.Init.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
+        <member name="T:TheEmployeeAPI.Migrations.Test">
+            <inheritdoc />
+        </member>
+        <member name="M:TheEmployeeAPI.Migrations.Test.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:TheEmployeeAPI.Migrations.Test.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:TheEmployeeAPI.Migrations.Test.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
     </members>
 </doc>

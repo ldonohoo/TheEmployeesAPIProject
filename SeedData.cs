@@ -9,7 +9,7 @@ public static class SeedData
     public static void MigrateAndSeed(IServiceProvider serviceProvider)
 {
     var context = serviceProvider.GetRequiredService<AppDbContext>();
-    context.Database.Migrate();
+    //context.Database.Migrate();
 
     if (!context.Employees.Any())
     {

@@ -1,6 +1,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Internal;
 using TheEmployeeAPI.Migrations;
 
 namespace TheEmployeeAPI;
@@ -8,15 +9,20 @@ namespace TheEmployeeAPI;
 // inherit from DbContext from Entity Framework!!!
 public class AppDbContext : DbContext
 {
+
+    private readonly ISystemClock _systemClock;
+
     // constructor for your DbContext!
     // this will call the constructor for the BASE class (which is DbContext)
     // with the options passed in.
     //   - calling the constructor on the base class DbContext with the given
     //     options witll make sure the connection string for the database is 
     //     set up, etc.
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) 
+    public AppDbContext(
+                 DbContextOptions<AppDbContext> options,
+                 ISystemClock systemClock) : base(options) 
     {
-
+        _systemClock = systemClock;
     }
     // declare a table with DbSet!
     // collection of Employee entities mapped to employees table in the database!
@@ -24,7 +30,7 @@ public class AppDbContext : DbContext
     public DbSet<Benefit> Benefits { get; set; } = null!;
     public DbSet<EmployeeBenefit> EmployeeBenefits { get; set; } = null!;
 
-       protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         //create a unique constraint on EmployeeId and BenefitId
         // this creates a unique index for EmployeeBenefit 
@@ -51,5 +57,39 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<EmployeeBenefit>()
             .HasIndex(eb => new {eb.BenefitId, eb.EmployeeId})
             .IsUnique();
+    }
+        public override int SaveChanges()
+    {
+        UpdateAuditFields();
+        return base.SaveChanges();
+    }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        UpdateAuditFields();
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
+    private void UpdateAuditFields()
+    {
+        var entries = ChangeTracker.Entries<AuditableEntity>();
+
+        foreach (var entry in entries)
+        {
+            if (entry.State == EntityState.Added)
+            {
+                entry.Entity.CreatedBy = "TheCreateUser";
+                // this will use system clock to pull in the datetime
+                //   so it can be overridden during testing and pull
+                //   in a specific datetime
+                entry.Entity.CreatedOn = _systemClock.UtcNow.UtcDateTime;
+            }
+
+            if (entry.State == EntityState.Modified)
+            {
+                entry.Entity.LastModifiedBy = "TheUpdateUser";
+                entry.Entity.LastModifiedOn = _systemClock.UtcNow.UtcDateTime;
+            }
+        }
     }
 }
